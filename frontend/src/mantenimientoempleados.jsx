@@ -10,6 +10,7 @@ import ExcelJS from 'exceljs';
 import { saveAs } from 'file-saver';
 
 const BASE_URL = "http://localhost:49146/api/";
+const LIMITE_EMPLEADOS = 10;
 
 Modal.setAppElement('#root');
 
@@ -45,6 +46,10 @@ const App = () => {
   const handleCreate = () => {
     const lettersOnlyRegex = /^[A-Za-z\s]+$/; // Expresión regular para solo letras y espacios
     const numbersOnlyRegex = /^[0-9]+$/; // Expresión regular para solo números
+    if (items.length >= LIMITE_EMPLEADOS) {
+      toast.warn('Límite alcanzado: solo se permiten ${LIMITE_EMPLEADOS} empleados.');
+      return;
+    }
     if (!lettersOnlyRegex.test(newNombre)) {
       toast.error('El nombre solo debe contener letras');
       return;
@@ -268,6 +273,20 @@ const App = () => {
       <h1>Mantenimiento LIV (CRUD)- Empleados</h1>
       {/* Link para regresar a la página principal */}
       <Link to="/">Volver al Menú Principal</Link>
+      <button
+         className="btn btn-primary ms-3"
+         onClick={openModal}
+         disabled={items.length >= LIMITE_EMPLEADOS}
+       >
+          Nuevo
+          </button>
+
+{items.length >= LIMITE_EMPLEADOS && (
+  <p className="text-danger mt-2">
+    Has alcanzado el número máximo de empleados permitidos.
+  </p>
+)}
+
 
       <button onClick={openModal}>Nuevo</button>
 

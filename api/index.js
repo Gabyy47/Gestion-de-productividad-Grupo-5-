@@ -721,7 +721,7 @@ app.put('/api/maquinaria', (request, response) => {
     }
 });
 
-// Delete de maquinaria
+// Delete de maquinariaS
 app.delete('/api/maquinaria/:id', (request, response) => {
     const query = "DELETE FROM l4test.maquinaria WHERE id_maquinaria = ?";
     const values = [parseInt(request.params.id)];
@@ -809,6 +809,221 @@ app.delete('/api/proveedores/:id', (req, res) => {
         }
         registrarBitacora("Proveedores", "DELETE");
         res.json({ status: "success", message: "Proveedor eliminado con éxito" });
+    });
+});
+// Rutas para Tipos de Ropa
+app.get('/api/tipos_ropas', (req, res) => {
+    const query = "SELECT * FROM tipos_ropas";
+    conexion.query(query, (err, rows) => {
+        if (err) return handleDatabaseError(err, res, "Error al obtener tipos de ropa:");
+        registrarBitacora("tipos_ropas", "GET");
+        res.json(rows);
+    });
+});
+
+app.post('/api/tipos_ropas', (req, res) => {
+    const { nombre } = req.body;
+    if (!nombre) return res.status(400).json({ error: "El nombre del tipo de ropa es requerido." });
+    const query = "INSERT INTO tipos_ropas (nombre) VALUES (?)";
+    conexion.query(query, [nombre], (err, result) => {
+        if (err) return handleDatabaseError(err, res, "Error al insertar tipo de ropa:");
+        registrarBitacora("tipos_ropa", "POST", req.body);
+        res.status(201).json({ message: "Tipo de ropa agregado con éxito", idtiposropa: result.insertId });
+    });
+});
+
+app.put('/api/tipos_ropas/:id', (req, res) => {
+    const { nombre } = req.body;
+    const { id } = req.params;
+    if (!nombre) return res.status(400).json({ error: "El nombre del tipo de ropa es requerido." });
+    const query = "UPDATE tipos_ropas SET nombre = ? WHERE idtipos_ropa = ?";
+    conexion.query(query, [nombre, id], (err, result) => {
+        if (err) return handleDatabaseError(err, res, "Error al actualizar tipo de ropa:");
+        if (result.affectedRows === 0) return res.status(404).json({ error: "Tipo de ropa no encontrado." });
+        registrarBitacora("tipos_ropa", "PUT", req.body);
+        res.json({ message: "Tipo de ropa actualizado con éxito" });
+    });
+});
+
+app.delete('/api/tipos_ropas/:id', (req, res) => {
+    const { id } = req.params;
+    const query = "DELETE FROM tipos_ropas WHERE idtipos_ropa = ?";
+    conexion.query(query, [id], (err, result) => {
+        if (err) return handleDatabaseError(err, res, "Error al eliminar tipo de ropa:");
+        if (result.affectedRows === 0) return res.status(404).json({ error: "Tipo de ropa no encontrado." });
+        registrarBitacora("tipos_ropa", "DELETE");
+        res.json({ message: "Tipo de ropa eliminado con éxito" });
+    });
+});
+
+// Rutas para Tipos de Estampado
+app.get('/api/tipos_estampado', (req, res) => {
+    const query = "SELECT * FROM tipos_estampado";
+    conexion.query(query, (err, rows) => {
+        if (err) return handleDatabaseError(err, res, "Error al obtener tipos de estampado:");
+        registrarBitacora("tipos_estampado", "GET");
+        res.json(rows);
+    });
+});
+
+app.post('/api/tipos_estampado', (req, res) => {
+    const { nombre } = req.body;
+    if (!nombre) return res.status(400).json({ error: "El nombre del tipo de estampado es requerido." });
+    const query = "INSERT INTO tipos_estampado (nombre) VALUES (?)";
+    conexion.query(query, [nombre], (err, result) => {
+        if (err) return handleDatabaseError(err, res, "Error al insertar tipo de estampado:");
+        registrarBitacora("tipos_estampado", "POST", req.body);
+        res.status(201).json({ message: "Tipo de estampado agregado con éxito", id_tipos_estampado: result.insertId });
+    });
+});
+
+app.put('/api/tipos_estampado/:id', (req, res) => {
+    const { nombre } = req.body;
+    const { id } = req.params;
+    if (!nombre) return res.status(400).json({ error: "El nombre del tipo de estampado es requerido." });
+    const query = "UPDATE tipos_estampado SET nombre = ? WHERE id_tipos_estampado = ?";
+    conexion.query(query, [nombre, id], (err, result) => {
+        if (err) return handleDatabaseError(err, res, "Error al actualizar tipo de estampado:");
+        if (result.affectedRows === 0) return res.status(404).json({ error: "Tipo de estampado no encontrado." });
+        registrarBitacora("tipos_estampado", "PUT", req.body);
+        res.json({ message: "Tipo de estampado actualizado con éxito" });
+    });
+});
+
+app.delete('/api/tipos_estampado/:id', (req, res) => {
+    const { id } = req.params;
+    const query = "DELETE FROM tipos_estampado WHERE id_tipos_estampado = ?";
+    conexion.query(query, [id], (err, result) => {
+        if (err) return handleDatabaseError(err, res, "Error al eliminar tipo de estampado:");
+        if (result.affectedRows === 0) return res.status(404).json({ error: "Tipo de estampado no encontrado." });
+        registrarBitacora("tipos_estampado", "DELETE");
+        res.json({ message: "Tipo de estampado eliminado con éxito" });
+    });
+});
+
+// Rutas para Tipos de Defecto
+app.get('/api/tipos_defecto', (req, res) => {
+    const query = "SELECT * FROM tipos_defecto";
+    conexion.query(query, (err, rows) => {
+        if (err) return handleDatabaseError(err, res, "Error al obtener tipos de defecto:");
+        registrarBitacora("tipos_defecto", "GET");
+        res.json(rows);
+    });
+});
+
+app.post('/api/tipos_defecto', (req, res) => {
+    const { nombre } = req.body;
+    if (!nombre) return res.status(400).json({ error: "El nombre del tipo de defecto es requerido." });
+    const query = "INSERT INTO tipos_defecto (nombre) VALUES (?)";
+    conexion.query(query, [nombre], (err, result) => {
+        if (err) return handleDatabaseError(err, res, "Error al insertar tipo de defecto:");
+        registrarBitacora("tipos_defecto", "POST", req.body);
+        res.status(201).json({ message: "Tipo de defecto agregado con éxito", id_tipos_defecto: result.insertId });
+    });
+});
+
+app.put('/api/tipos_defecto/:id', (req, res) => {
+    const { nombre } = req.body;
+    const { id } = req.params;
+    if (!nombre) return res.status(400).json({ error: "El nombre del tipo de defecto es requerido." });
+    const query = "UPDATE tipos_defecto SET nombre = ? WHERE id_tipos_defecto = ?";
+    conexion.query(query, [nombre, id], (err, result) => {
+        if (err) return handleDatabaseError(err, res, "Error al actualizar tipo de defecto:");
+        if (result.affectedRows === 0) return res.status(404).json({ error: "Tipo de defecto no encontrado." });
+        registrarBitacora("tipos_defecto", "PUT", req.body);
+        res.json({ message: "Tipo de defecto actualizado con éxito" });
+    });
+});
+
+app.delete('/api/tipos_defecto/:id', (req, res) => {
+    const { id } = req.params;
+    const query = "DELETE FROM tipos_defecto WHERE id_tipos_defecto = ?";
+    conexion.query(query, [id], (err, result) => {
+        if (err) return handleDatabaseError(err, res, "Error al eliminar tipo de defecto:");
+        if (result.affectedRows === 0) return res.status(404).json({ error: "Tipo de defecto no encontrado." });
+        registrarBitacora("tipos_defecto", "DELETE");
+        res.json({ message: "Tipo de defecto eliminado con éxito" });
+    });
+});
+
+// Rutas para la asignación de procesos a empleados
+app.get('/api/empleados/:empleadoId/procesos', (req, res) => {
+    const { empleadoId } = req.params;
+    const query = `
+        SELECT
+            tr.id AS ropa_id, tr.nombre AS ropa_nombre,
+            te.id AS estampado_id, te.nombre AS estampado_nombre,
+            td.id AS defecto_id, td.nombre AS defecto_nombre,
+            ep.tipo_proceso
+        FROM empleados e
+        LEFT JOIN empleado_procesos ep ON e.id = ep.empleado_id
+        LEFT JOIN tipos_ropa tr ON ep.tipo_proceso = 'ropa' AND ep.proceso_id = tr.id
+        LEFT JOIN tipos_estampado te ON ep.tipo_proceso = 'estampado' AND ep.proceso_id = te.id
+        LEFT JOIN tipos_defecto td ON ep.tipo_proceso = 'defecto' AND ep.proceso_id = td.id
+        WHERE e.id = ?
+    `;
+    conexion.query(query, [empleadoId], (err, rows) => {
+        if (err) return handleDatabaseError(err, res, "Error al obtener procesos del empleado:");
+        const procesos = { ropa: [], estampado: [], genero: [], defecto: [] };
+        rows.forEach(row => {
+            if (row.tipo_proceso === 'ropa' && row.ropa_id) procesos.ropa.push({ id: row.ropa_id, nombre: row.ropa_nombre });
+            if (row.tipo_proceso === 'estampado' && row.estampado_id) procesos.estampado.push({ id: row.estampado_id, nombre: row.estampado_nombre });
+            if (row.tipo_proceso === 'genero' && row.genero_id) procesos.genero.push({ id: row.genero_id, nombre: row.genero_nombre });
+            if (row.tipo_proceso === 'defecto' && row.defecto_id) procesos.defecto.push({ id: row.defecto_id, nombre: row.defecto_nombre });
+        });
+        res.json(procesos);
+    });
+});
+
+app.post('/api/empleados/:empleadoId/procesos', (req, res) => {
+    const { empleadoId } = req.params;
+    const { ropa, estampado, genero, defecto } = req.body;
+
+    // Helper function to insert process
+    const insertProcess = (tipo_proceso, proceso_id) => {
+        return new Promise((resolve, reject) => {
+            const query = "INSERT INTO empleado_procesos (empleado_id, tipo_proceso, proceso_id) VALUES (?, ?, ?)";
+            conexion.query(query, [empleadoId, tipo_proceso, proceso_id], (err) => {
+                if (err) reject(err);
+                resolve();
+            });
+        });
+    };
+
+    conexion.beginTransaction(async (err) => {
+        if (err) return handleDatabaseError(err, res, "Error al iniciar la transacción:");
+        try {
+            // Delete existing processes for the employee
+            await new Promise((resolve, reject) => {
+                conexion.query("DELETE FROM empleado_procesos WHERE empleado_id = ?", [empleadoId], (err) => {
+                    if (err) reject(err);
+                    resolve();
+                });
+            });
+
+            // Insert new processes
+            const promises = [];
+            ropa.forEach(id => promises.push(insertProcess('ropa', id)));
+            estampado.forEach(id => promises.push(insertProcess('estampado', id)));
+            genero.forEach(id => promises.push(insertProcess('genero', id)));
+            defecto.forEach(id => promises.push(insertProcess('defecto', id)));
+
+            await Promise.all(promises);
+
+            conexion.commit((err) => {
+                if (err) {
+                    return conexion.rollback(() => {
+                        handleDatabaseError(err, res, "Error al hacer commit de la transacción:");
+                    });
+                }
+                registrarBitacora("empleado_procesos", "POST", req.body);
+                res.json({ message: "Procesos del empleado actualizados exitosamente" });
+            });
+        } catch (error) {
+            return conexion.rollback(() => {
+                handleDatabaseError(error, res, "Error al guardar los procesos del empleado:");
+            });
+        }
     });
 });
 
