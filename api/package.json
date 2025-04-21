@@ -1,0 +1,25 @@
+{
+  "name": "proyellp4",
+  "version": "1.0.0",
+  "description": "api",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Alejandra Artica",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^2.2.0",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.5",
+    "express": "^4.21.2",
+    "helmet": "^8.0.0",
+    "jsonwebtoken": "^9.0.2",
+    "mysql": "^2.18.1",
+    "mysql2": "^3.12.0",
+    "qrcode": "^1.5.4",
+    "speakeasy": "^2.0.0",
+    "winston": "^3.17.0"
+  },
+  "keywords": []
+}
