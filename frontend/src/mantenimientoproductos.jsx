@@ -4,8 +4,14 @@ import Modal from 'react-modal';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { Link } from 'react-router-dom';
+import { jsPDF } from 'jspdf';
+import autoTable from 'jspdf-autotable';
+import ExcelJS from 'exceljs';
+import { saveAs } from 'file-saver';
+import { validateProductData, validateStockLevel, validateMeasurementUnit } from './utils/validations.js';
 
 const BASE_URL = "http://localhost:49146/api/";
+const limite_productos = 10;
 
 Modal.setAppElement('#root');
 
@@ -38,6 +44,34 @@ const App = () => {
   }, []);
 
   const handleCreate = () => {
+    if (items.length >= limite_productos) {
+      toast.error('Límite de productos alcanzado. No se pueden agregar más productos.');
+      return;
+    }
+    const productData = {
+      nombre: newNombre,
+      unidad_medida: newUnidad_medida,
+      proveedor: newProveedor,
+      precio_unitario: newPrecio_unitario,
+      cantidad_stock: newCantidad_stock,
+      fecha_ultima_compra: newFecha_ultima_compra
+  };
+
+  const validationErrors = validateProductData(productData);
+  
+  if (validationErrors.length > 0) {
+      validationErrors.forEach(error => toast.error(error));
+      return;
+  }
+
+  if (!validateMeasurementUnit(productData.unidad_medida)) {
+      toast.error('Unidad de medida no válida');
+      return;
+  }
+
+  if (validateStockLevel(productData.cantidad_stock)) {
+      toast.warn('¡Stock crítico! Nivel por debajo del mínimo recomendado');
+  }
     if(newNombre.trim() && newUnidad_medida.trim() && newProveedor.trim() && newPrecio_unitario.trim() && newCantidad_stock.trim() && newFecha_ultima_compra.trim()) {
       axios.post(`${BASE_URL}Productos`, {
         nombre: newNombre,
@@ -76,6 +110,21 @@ const App = () => {
   };
 
   const handleUpdate = () => {
+    const productData = {
+      nombre: newNombre,
+      unidad_medida: newUnidad_medida,
+      proveedor: newProveedor,
+      precio_unitario: newPrecio_unitario,
+      cantidad_stock: newCantidad_stock,
+      fecha_ultima_compra: newFecha_ultima_compra
+  };
+
+  const validationErrors = validateProductData(productData);
+  
+  if (validationErrors.length > 0) {
+      validationErrors.forEach(error => toast.error(error));
+      return;
+  }
     const { nombre, unidad_medida, proveedor, precio_unitario, cantidad_stock, fecha_ultima_compra } = { newNombre, newUnidad_medida, newProveedor, newPrecio_unitario, newCantidad_stock, newFecha_ultima_compra };
     axios.put(`${BASE_URL}Productos/${editItemId}`, {
       id_producto:editItemId,
@@ -125,6 +174,63 @@ const App = () => {
     setIsEditModalOpen(false);
     setEditItemId(null);
   };
+
+//GENERAR REPORTE PDF 
+const generatePDFReport = () => {
+  try {
+    console.log('Generando reporte PDF...');
+    const doc = new jsPDF();
+    doc.text('Reporte de Productos', 20, 10);
+    const tableHeaders = [['ID', 'Nombre', 'Unidad Medida', 'Proveedor', 'Precio Unitario', 'Cantidad Stock', 'Fecha Ultima Compra']];
+    autoTable(doc,{
+      head: tableHeaders,
+      body: items.map(item => [
+        item.id_producto,
+        item.nombre,
+        item.unidad_medida,
+        item.proveedor,
+        item.precio_unitario,
+        item.cantidad_stock,
+        item.fecha_ultima_compra
+      ]),
+    });
+    // Guardar el documento como un archivo PDF
+    doc.save('reporte-productos.pdf');
+    console.log('PDF generado y guardado exitosamente.');
+    toast.success('PDF generado y guardado exitosamente.');
+  } catch (error) {
+    console.error('Error al generar el PDF:', error);
+    toast.error('Error al generar el PDF');
+  }
+};
+
+
+//GENERAR LOS REPORTES EXCEL
+  // Función para generar el reporte en Excel
+  async function generateExcelReport() {
+  console.log('Generando reporte Excel...');
+  const workbook = new ExcelJS.Workbook();
+  const worksheet = workbook.addWorksheet('Productos');
+
+  worksheet.columns = [
+    { header: 'ID', key: 'id_producto', width: 10 },
+    { header: 'Nombre', key: 'nombre', width: 30 },
+    { header: 'Unidad Medida', key: 'unidad_medida', width: 20 },
+    { header: 'Proveedor', key: 'proveedor', width: 30 },
+    { header: 'Precio Unitario', key: 'precio_unitario', width: 15 },
+    { header: 'Cantidad Stock', key: 'cantidad_stock', width: 15 },
+    { header: 'Fecha Ultima Compra', key: 'fecha_ultima_compra', width: 20 },
+  ];
+
+  items.forEach(item => {
+    worksheet.addRow(item);
+  });
+
+  const buffer = await workbook.xlsx.writeBuffer();
+  saveAs(new Blob([buffer]), 'reporte-productos.xlsx');
+  console.log('Excel generado y guardado exitosamente.');
+  toast.success('Excel generado y guardado exitosamente.');
+}
 
   return (
     <div>
@@ -190,6 +296,11 @@ const App = () => {
           ))}
         </tbody>
       </table>
+
+      <div style={{ margin: '20px 0', display: 'flex', gap: '10px' }}>
+        <button onClick={generatePDFReport} style={{ backgroundColor: '#e13031', marginRight: '5px' }}>Descargar PDF</button>
+        <button onClick={generateExcelReport} style={{ backgroundColor: '#1cc605', marginRight: '5px' }}>Descargar Excel</button>
+      </div>
 
       <ToastContainer
         autoClose={3000}
