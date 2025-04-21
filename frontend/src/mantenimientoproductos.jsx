@@ -11,6 +11,7 @@ import { saveAs } from 'file-saver';
 import { validateProductData, validateStockLevel, validateMeasurementUnit } from './utils/validations.js';
 
 const BASE_URL = "http://localhost:49146/api/";
+const limite_productos = 10;
 
 Modal.setAppElement('#root');
 
@@ -43,6 +44,10 @@ const App = () => {
   }, []);
 
   const handleCreate = () => {
+    if (items.length >= limite_productos) {
+      toast.error('Límite de productos alcanzado. No se pueden agregar más productos.');
+      return;
+    }
     const productData = {
       nombre: newNombre,
       unidad_medida: newUnidad_medida,
@@ -296,8 +301,6 @@ const generatePDFReport = () => {
         <button onClick={generatePDFReport} style={{ backgroundColor: '#e13031', marginRight: '5px' }}>Descargar PDF</button>
         <button onClick={generateExcelReport} style={{ backgroundColor: '#1cc605', marginRight: '5px' }}>Descargar Excel</button>
       </div>
-
-
 
       <ToastContainer
         autoClose={3000}
